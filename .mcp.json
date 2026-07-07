@@ -1,0 +1,11 @@
+{
+  "mcpServers": {
+    "nexus-memory": {
+      "command": "nexus",
+      "args": ["serve", "--transport", "stdio"],
+      "env": {
+        "RUST_LOG": "warn"
+      }
+    }
+  }
+}

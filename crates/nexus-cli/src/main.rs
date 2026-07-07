@@ -454,13 +454,19 @@ async fn main() -> anyhow::Result<()> {
 
     star::star_repo_background();
 
-    // Initialize logging
+    // Initialize logging.
+    //
+    // Logs are written to stderr, never stdout: the `serve --transport stdio`
+    // MCP server uses stdout for the JSON-RPC channel, and any log line on
+    // stdout corrupts the protocol and makes clients (Claude Code / Claude
+    // Desktop) fail to connect. stderr is the correct sink for diagnostics and
+    // is captured by MCP clients into their debug logs.
     let filter = tracing_subscriber::EnvFilter::try_from_default_env()
         .unwrap_or_else(|_| tracing_subscriber::EnvFilter::new(&cli.log_level));
 
     tracing_subscriber::registry()
         .with(filter)
-        .with(tracing_subscriber::fmt::layer())
+        .with(tracing_subscriber::fmt::layer().with_writer(std::io::stderr))
         .init();
 
     // Load stored per-provider credentials before any command runs

@@ -90,6 +90,7 @@ pub struct ServerCapabilities {
 
 /// Tool capabilities
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ToolsCapability {
     /// Whether the server supports list_changed notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -98,6 +99,7 @@ pub struct ToolsCapability {
 
 /// Resource capabilities
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ResourcesCapability {
     /// Whether the server supports subscribe/unsubscribe
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -109,6 +111,7 @@ pub struct ResourcesCapability {
 
 /// Prompt capabilities
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct PromptsCapability {
     /// Whether the server supports list_changed notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -121,6 +124,7 @@ pub struct PromptsCapability {
 
 /// Initialize request parameters
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct InitializeParams {
     /// Protocol version the client supports
     pub protocol_version: String,
@@ -146,6 +150,7 @@ pub struct ClientCapabilities {
 
 /// Roots capability for listing roots
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct RootsCapability {
     /// Whether the client supports list_changed notifications
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -154,6 +159,7 @@ pub struct RootsCapability {
 
 /// Initialize result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct InitializeResult {
     /// Protocol version the server uses
     pub protocol_version: String,
@@ -194,6 +200,7 @@ impl Default for InitializeResult {
 
 /// Tool definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Tool {
     /// Tool name
     pub name: String,
@@ -226,6 +233,7 @@ impl Tool {
 
 /// List tools result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ListToolsResult {
     /// List of tools
     pub tools: Vec<Tool>,
@@ -246,6 +254,7 @@ pub struct CallToolParams {
 
 /// Tool call result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct CallToolResult {
     /// Result content
     pub content: Vec<ContentBlock>,
@@ -289,7 +298,11 @@ pub enum ContentBlock {
     Text { text: String },
     /// Image content
     #[serde(rename = "image")]
-    Image { data: String, mime_type: String },
+    Image {
+        data: String,
+        #[serde(rename = "mimeType")]
+        mime_type: String,
+    },
     /// Resource content
     #[serde(rename = "resource")]
     Resource { resource: ResourceContents },
@@ -329,6 +342,7 @@ impl ContentBlock {
 
 /// Resource definition
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct Resource {
     /// Resource URI
     pub uri: String,
@@ -368,6 +382,7 @@ impl Resource {
 
 /// Resource template for parameterized resources
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ResourceTemplate {
     /// Template URI pattern
     pub uri_template: String,
@@ -383,6 +398,7 @@ pub struct ResourceTemplate {
 
 /// List resources result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ListResourcesResult {
     /// List of resources
     pub resources: Vec<Resource>,
@@ -407,6 +423,7 @@ pub struct ReadResourceResult {
 
 /// Resource contents
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ResourceContents {
     /// Resource URI
     pub uri: String,
@@ -482,6 +499,7 @@ pub struct PromptArgument {
 
 /// List prompts result
 #[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct ListPromptsResult {
     /// List of prompts
     pub prompts: Vec<Prompt>,
