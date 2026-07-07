@@ -19,9 +19,54 @@ actually exposes.
 
 ## Requirements
 
-- Rust stable toolchain + Cargo
-- Git
+- **Git** — to clone the repo
+- **Rust stable toolchain + Cargo** — to build the `nexus` binary
+- **A C/C++ linker** — on Windows this means the **MSVC / "Desktop development with C++"** Build Tools; the Rust MSVC toolchain links against them
+- **Node.js** — the Claude Code hooks run through a `node` shim, so capture does not work without it
+- **Claude CLI** (`claude`) — to register the MCP server (`claude mcp add ...`)
+- **Claude Desktop** installed — for the GUI integration
 - A machine that can run SQLite-backed Rust binaries (macOS, Linux/WSL, or Windows)
+
+> **Do not skip Step 0.** Run the prerequisite check below *before* any build/install command,
+> so you never chase a failure (like `cargo: command not found`) halfway through.
+
+---
+
+## Step 0 — Verify prerequisites first (do this before anything else)
+
+Run this and confirm each line before proceeding. Fix any `[FALTA]` / `MISSING` item first.
+
+**Windows (PowerShell):**
+
+```powershell
+Write-Host "=== Nexus prerequisite check ==="
+function Check($name,$cmd){ $p=Get-Command $cmd -ErrorAction SilentlyContinue;
+  if($p){Write-Host "[OK]      $name -> $($p.Source)"}else{Write-Host "[MISSING] $name ($cmd not found)"} }
+Check "Git" git
+Check "Rust (rustc)" rustc
+Check "Cargo" cargo
+Check "Node.js" node
+Check "Claude CLI" claude
+cargo --version 2>$null; rustc --version 2>$null; node --version 2>$null
+rustup show 2>$null | Select-String "default host|msvc"
+if(Test-Path "$env:APPDATA\Claude"){Write-Host "[OK]      Claude Desktop config: $env:APPDATA\Claude"}
+else{Write-Host "[MISSING] Claude Desktop not installed / never opened"}
+```
+
+**macOS / Linux (bash):**
+
+```bash
+echo "=== Nexus prerequisite check ==="
+for c in git rustc cargo node claude; do
+  if command -v "$c" >/dev/null 2>&1; then echo "[OK]      $c -> $(command -v "$c")";
+  else echo "[MISSING] $c"; fi
+done
+cargo --version 2>/dev/null; rustc --version 2>/dev/null; node --version 2>/dev/null
+```
+
+If Rust/Cargo is missing, install it from <https://rustup.rs> (on Windows install the
+**"Desktop development with C++"** Build Tools first), then **open a new terminal** and re-run
+Step 0. Only continue when every item reports `[OK]`.
 
 ---
 
