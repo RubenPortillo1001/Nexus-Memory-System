@@ -284,6 +284,7 @@ and reducing token usage on later interactions.
 
 | Symptom | Likely cause | Fix |
 | :-- | :-- | :-- |
+| MCP `nexus-memory: … × Failed to connect` (or 🔨 missing) despite correct config | On builds before the stderr fix, `nexus` logged to **stdout**, corrupting the MCP JSON-RPC channel | Rebuild from a version that logs to stderr, **or** silence logs on the server: register with `RUST_LOG=off` in its `env` (e.g. `claude mcp add nexus-memory --scope user --env RUST_LOG=off -- nexus serve --transport stdio`) |
 | 🔨 does not appear in Claude Desktop | JSON syntax error or relative binary path | Validate the JSON; use the **absolute** binary path |
 | API resolution fails on a call | API env vars not propagated to the GUI process | Add the key (e.g. `ANTHROPIC_API_KEY`) under `env` in the config |
 | Nexus DB is locked | Concurrent processes holding the SQLite file | Stop orphan `nexus` processes before starting a new session |
