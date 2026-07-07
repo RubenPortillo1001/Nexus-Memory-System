@@ -70,6 +70,70 @@ Step 0. Only continue when every item reports `[OK]`.
 
 ---
 
+## Windows (PowerShell) — self-contained path
+
+`scripts/install.sh` is a **bash** script and does not run in PowerShell, so on Windows you
+build the binary and place it on `PATH` yourself. There is also one important gotcha:
+
+> **Set `NEXUS_DATABASE_PATH` to an absolute path on Windows.** Nexus's default database
+> location is derived from the `HOME` environment variable, which Windows usually does not set
+> — without an explicit path the DB would be created relative to the current directory, so the
+> CLI and Claude Desktop could end up with *different* databases. Fixing `NEXUS_DATABASE_PATH`
+> (persistently **and** in the Claude Desktop `env` block) makes all of them share one DB.
+
+Replace `RubenPortillo1` with your own Windows username if different.
+
+```powershell
+# 1) Fixed DB path (persistent user var + current session) and its folder
+[Environment]::SetEnvironmentVariable("NEXUS_DATABASE_PATH","$env:USERPROFILE\.nexus\nexus.db","User")
+$env:NEXUS_DATABASE_PATH = "$env:USERPROFILE\.nexus\nexus.db"
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.nexus" | Out-Null
+
+# 2) Clone OUTSIDE C:\Windows\System32 and build
+cd $env:USERPROFILE
+git clone https://github.com/scooter-lacroix/Nexus-Memory-System.git
+cd Nexus-Memory-System
+cargo build --release -p nexus-memory
+
+# 3) Put nexus.exe on PATH (~/.cargo/bin is already on PATH)
+Copy-Item .\target\release\nexus.exe "$env:USERPROFILE\.cargo\bin\nexus.exe" -Force
+nexus --version
+
+# 4) Initialize DB + configure embeddings (choose local ONNX in the wizard)
+nexus init
+nexus config
+nexus config show
+nexus stats
+
+# 5) Activate in Claude Code (native hooks + user-scope MCP)
+nexus hooks install --agent claude-code
+nexus hooks status --verbose
+claude mcp add nexus-memory --scope user -- nexus serve --transport stdio
+claude mcp list
+```
+
+**6) Claude Desktop** — edit `%APPDATA%\Claude\claude_desktop_config.json` (absolute `.exe`
+path + `NEXUS_DATABASE_PATH` in `env`), then fully quit and relaunch the app:
+
+```json
+{
+  "mcpServers": {
+    "nexus-memory": {
+      "command": "C:\\Users\\RubenPortillo1\\.cargo\\bin\\nexus.exe",
+      "args": ["serve", "--transport", "stdio"],
+      "env": {
+        "RUST_LOG": "warn",
+        "NEXUS_DATABASE_PATH": "C:\\Users\\RubenPortillo1\\.nexus\\nexus.db"
+      }
+    }
+  }
+}
+```
+
+The macOS/Linux equivalents follow in sections 1–4 (they use `scripts/install.sh`).
+
+---
+
 ## 1. Build and install
 
 ```bash
